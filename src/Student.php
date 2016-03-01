@@ -39,9 +39,51 @@
 
         function save()
         {
-            $GLOBALS['DB']->exec ("INSERT INTO students (name, enrollment_date) VALUES ('{$this->getName()}', '{$this->getEnrollmentDate()});");
-            $this->id = $GLOBALS['DB']->lastInsertId();              
+            $GLOBALS['DB']->exec ("INSERT INTO students (name, enrollment_date) VALUES ('{$this->getName()}', '{$this->getEnrollmentDate()}');");
+            $this->id = $GLOBALS['DB']->lastInsertId();
         }
+
+        static function getAll()
+        {
+            $returned_students = $GLOBALS['DB']->query("SELECT * FROM students;");
+            $students = array();
+            foreach($returned_students as $student) {
+                $name = $student['name'];
+                $enrollment_date = $student['enrollment_date'];
+                $id = $student['id'];
+                $new_student = new Student($name, $enrollment_date, $id);
+                array_push($students, $new_student);
+            }
+            return $students;
+        }
+
+        static function deleteAll()
+           {
+             $GLOBALS['DB']->exec("DELETE FROM students;");
+           }
+
+       static function find($search_id)
+        {
+            $found_student = null;
+            $students = Student::getAll();
+              foreach($students as $student) {
+                  $student_id = $student->getId();
+                  if ($student_id == $search_id) {
+                    $found_student = $student;
+                  }
+              }
+              return $found_student;
+        }
+
+        function update($new_name, $new_enrollment_date)
+        {
+            $GLOBALS['DB']->exec("UPDATE students SET name = '{$new_name}', enrollment_date = {$new_enrollment_date} WHERE id = {$this->getId()};");
+            $this->setName($new_name);
+            $this->setEnrollmentDate($new_enrollment_date);
+        }
+
+
+
 
 
     }
